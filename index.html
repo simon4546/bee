@@ -76,6 +76,7 @@
                     }).success(function () {
                     }).error(function (ex) { 
                         console.log(ex)
+                        layer.close(index);
                     });
 
                     // layer.msg('正在处理中', {
