@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./static/css/layui.css" media="all">
+</head>
+
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <table class="layui-hide" id="test" lay-filter="hosts"></table>
+            </div>
+        </div>
+
+        <!-- 移动设备、平板、桌面端的不同表现：
+        <div class="layui-row">
+            <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                移动：6/12 | 平板：6/12 | 桌面：4/12
+            </div>
+            <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                移动：6/12 | 平板：6/12 | 桌面：4/12
+            </div>
+            <div class="layui-col-xs4 layui-col-sm12 layui-col-md4">
+                移动：4/12 | 平板：12/12 | 桌面：4/12
+            </div>
+            <div class="layui-col-xs4 layui-col-sm7 layui-col-md8">
+                移动：4/12 | 平板：7/12 | 桌面：8/12
+            </div>
+            <div class="layui-col-xs4 layui-col-sm5 layui-col-md4">
+                移动：4/12 | 平板：5/12 | 桌面：4/12
+            </div>
+        </div> -->
+    </div>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="check">支票</a>
+      </script>
+    <script src="./static/layui.all.js"></script>
+    <script>
+        function check($, host, callback) {
+            $.get("http://localhost:3000/check", { host: host }, callback)
+        }
+        layui.use(['table', 'layer'], function () {
+            var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+            var table = layui.table;
+            table.render({
+                elem: '#test',
+                url: 'http://localhost:3000/hosts',
+                // page: true,
+                // limit:10,
+                cellMinWidth: 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                cols: [[
+                    { field: 'id', width: 80, title: 'ID', sort: true },
+                    { field: 'host', title: '接口地址', sort: true },
+                    { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
+                ]]
+            });
+
+            //监听行工具事件
+            table.on('tool(hosts)', function (obj) {
+                var data = obj.data;
+                //console.log(obj)
+                if (obj.event === 'check') {
+                    var host = data.host;
+                    var index = layer.load(1);
+                    $.post("http://localhost:3000/check", { host: host }, function (data, status) {
+                        let count=data.peers.length;
+                        let cashcount=data.hash?data.hash.length:0;
+                        layer.close(index);
+                        alert("支票总数: " + count + "\n迁出支票个数: " + cashcount);
+                    }).success(function () {
+                    }).error(function (ex) { 
+                        console.log(ex)
+                    });
+
+                    // layer.msg('正在处理中', {
+                    //     icon: 16,
+                    //     time: 20000,
+                    //     shade: 0.01
+                    // });
+
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
