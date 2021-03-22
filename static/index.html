@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Swarm-Bee</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -25,30 +25,15 @@
                 <table class="layui-hide" id="test" lay-filter="hosts"></table>
             </div>
         </div>
-
-        <!-- 移动设备、平板、桌面端的不同表现：
-        <div class="layui-row">
-            <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                移动：6/12 | 平板：6/12 | 桌面：4/12
-            </div>
-            <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                移动：6/12 | 平板：6/12 | 桌面：4/12
-            </div>
-            <div class="layui-col-xs4 layui-col-sm12 layui-col-md4">
-                移动：4/12 | 平板：12/12 | 桌面：4/12
-            </div>
-            <div class="layui-col-xs4 layui-col-sm7 layui-col-md8">
-                移动：4/12 | 平板：7/12 | 桌面：8/12
-            </div>
-            <div class="layui-col-xs4 layui-col-sm5 layui-col-md4">
-                移动：4/12 | 平板：5/12 | 桌面：4/12
-            </div>
-        </div> -->
     </div>
+    <script type="text/html" id="peerCell">
+        <a target="_blank" href="{{d.host}}/peers">节点</a>
+      </script>
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-xs" lay-event="find">支票</a>
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="find">支票</a>
         <a class="layui-btn layui-btn-xs" lay-event="check">迁出</a>
       </script>
+      
     <script src="./layui.all.js"></script>
     <script src="./async.min.js"></script>
     <script>
@@ -80,9 +65,6 @@
                     }
                 }
             });
-            // $.post("chequebook", { host: host }, callback).error(function (ex) {
-            //     callback("fail", 503)
-            // })
         }
         function checkAll($,data) {
             async.eachLimit(data, 5, function (item, callback) {
@@ -91,15 +73,10 @@
                 check($, host, function (data, status) {
                     $('div[lay-id=test] .layui-table-body table tr:nth-child(' + (idx) + ') td:nth-child(3) div').html(data)
                     console.log(data)
-                    // if(data=='fail')
                     callback()
-                    // doStuff(arr, ++idx);
                 })
             }, function (err) {
-                // if any of the file processing produced an error, err would equal that error
                 if (err) {
-                    // One of the iterations produced an error.
-                    // All processing will now stop.
                     console.log('A file failed to process');
                 } else {
                     console.log('All files have been processed successfully');
@@ -118,7 +95,9 @@
                 cols: [[
                     { field: 'id', width: 80, title: 'ID', sort: true },
                     { field: 'host', title: '接口地址', sort: true },
+                    
                     { fixed: 'right', title: '支票数', width: 150 },
+                    { fixed: 'right', title: '节点', toolbar: '#peerCell', width: 150 },
                     { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
                 ]],
                 done: function (res, curr, count) {
