@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Swarm-Bee</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./css/layui.css" media="all">
+</head>
+
+<body>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-xs6">
+                <div class="grid-demo grid-demo-bg1">
+                    <button type="button" id="findall" class="layui-btn layui-btn-primary">查询支票</button>
+                    <button type="button" id="checkoutall" class="layui-btn">迁出支票</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <table class="layui-hide" id="test" lay-filter="hosts"></table>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="peerCell">
+        <a target="_blank" href="{{d.host}}/peers">节点</a>
+      </script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="find">支票</a>
+        <a class="layui-btn layui-btn-xs" lay-event="check">迁出</a>
+      </script>
+      
+    <script src="./layui.all.js"></script>
+    <script src="./async.min.js"></script>
+    <script>
+        var hostList;
+        function check($, host, callback) {
+            $.ajax({
+                url: 'chequebook',
+                type: 'POST',
+                data: { host: host },
+                tryCount: 0,
+                retryLimit: 3,
+                success: function (json) {
+                    callback(json)
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (textStatus == 'timeout' || textStatus == "error") {
+                        this.tryCount++;
+                        if (this.tryCount <= this.retryLimit) {
+                            //try again
+                            $.ajax(this);
+                            return;
+                        }
+                        return callback("fail", 503);
+                    }
+                    if (xhr.status == 500) {
+                        callback("fail", 503)
+                    } else {
+                        callback("fail", 503)
+                    }
+                }
+            });
+        }
+        function checkAll($,data) {
+            async.eachLimit(data, 5, function (item, callback) {
+                let host = item['host']
+                let idx = item['id'];
+                check($, host, function (data, status) {
+                    $('div[lay-id=test] .layui-table-body table tr:nth-child(' + (idx) + ') td:nth-child(3) div').html(data)
+                    console.log(data)
+                    callback()
+                })
+            }, function (err) {
+                if (err) {
+                    console.log('A file failed to process');
+                } else {
+                    console.log('All files have been processed successfully');
+                }
+            });
+        }
+        layui.use(['table', 'layer'], function () {
+            var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+            var table = layui.table;
+            table.render({
+                elem: '#test',
+                url: 'hosts',
+                // page: true,
+                // limit:10,
+                cellMinWidth: 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                cols: [[
+                    { field: 'id', width: 80, title: 'ID', sort: true },
+                    { field: 'host', title: '接口地址', sort: true },
+                    
+                    { fixed: 'right', title: '支票数', width: 150 },
+                    { fixed: 'right', title: '节点', toolbar: '#peerCell', width: 150 },
+                    { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
+                ]],
+                done: function (res, curr, count) {
+                    console.log(res);
+                    console.log(curr);
+                    console.log(count);
+                    hostList=res.data;
+                }
+            });
+            $("#findall").click(function(){
+                checkAll($,hostList);
+            })
+            //监听行工具事件
+            table.on('tool(hosts)', function (obj) {
+                var data = obj.data;
+                //console.log(obj)
+                if (obj.event === 'check') {
+                    var host = data.host;
+                    var index = layer.load(1);
+                    $.post("check", { host: host }, function (data, status) {
+                        let count = data.peers.length;
+                        let cashcount = data.hash ? data.hash.length : 0;
+                        layer.close(index);
+                        alert("支票总数: " + count + "\n迁出支票个数: " + cashcount);
+                    }).success(function () {
+                    }).error(function (ex) {
+                        console.log(ex)
+                    });
+
+                    // layer.msg('正在处理中', {
+                    //     icon: 16,
+                    //     time: 20000,
+                    //     shade: 0.01
+                    // });
+
+                }else{
+                    var host = data.host;
+                    var index = layer.load(1);
+                    $.post("chequebook", { host: host }, function (res, status) {
+                        let count = res;
+                        $('div[lay-id=test] .layui-table-body table tr:nth-child(' + (data.id) + ') td:nth-child(3) div').html(count)
+                        layer.close(index);
+                    }).success(function () {
+                    }).error(function (ex) {
+                        console.log(ex)
+                    });
+                }
+
+            });
+        });
+    </script>
+</body>
+
+</html>

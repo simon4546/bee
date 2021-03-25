@@ -192,7 +192,9 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 module.exports={
-    cashoutOne:cashoutOne
+    cashoutOne:cashoutOne,
+    getPeers:getPeers,
+    getAddress:getAddress
 }
 // (async function () {
 //     // await address();
