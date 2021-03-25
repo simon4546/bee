@@ -46,6 +46,17 @@ webapp.post('/check', (req, res) => {
         res.status(503).end()
     })
 })
+
+webapp.post('/check',async (req, res) => {
+    let hosts = require("./hosts");
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        let address=await cashUtil.getAddress(element)
+        console.log(element,address)
+    }
+})
+
+
 webapp.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
