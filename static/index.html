@@ -72,7 +72,7 @@
                 let host = item['host']
                 let idx = item['id'];
                 check($, host, function (data, status) {
-                    $('div[lay-id=test] .layui-table-body table tr:nth-child(' + (idx) + ') td:nth-child(3) div').html(data)
+                    $('div[lay-id=test] .layui-table-body table tr:nth-child(' + (idx) + ') td:nth-child(4) div').html(data)
                     console.log(data)
                     callback()
                 })
