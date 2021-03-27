@@ -1,6 +1,7 @@
 const express = require('express');
 let cashUtil = require("./cash");
 const fs = require('fs');
+const path = require('path');
 var async = require("async");
 var compression = require('compression')
 
@@ -10,7 +11,7 @@ webapp.use(compression());
 webapp.use(express.json()) // for parsing application/json
 webapp.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-webapp.use(express.static('static'))
+webapp.use(express.static(path.join(__dirname, 'static')))
 webapp.get('/hosts', (req, res) => {
     // let hosts = require("./hosts")
     console.log("拉取列表")
