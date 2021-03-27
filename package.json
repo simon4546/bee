@@ -6,9 +6,18 @@
   "scripts": {
     "start": "electron ."
   },
+  "bin": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "pkg": {
+    "scripts": [
+      "cash.js"
+    ],
+    "assets": [
+      "static/**/*"
+    ]
+  },
   "dependencies": {
     "async": "^3.2.0",
     "axios": "^0.21.1",

@@ -1,5 +1,6 @@
 const express = require('express');
-let cashUtil = require("./cash")
+let cashUtil = require("./cash");
+const fs = require('fs');
 var async = require("async");
 var compression = require('compression')
 
@@ -11,7 +12,9 @@ webapp.use(express.urlencoded({ extended: true })) // for parsing application/x-
 
 webapp.use(express.static('static'))
 webapp.get('/hosts', (req, res) => {
-    let hosts = require("./hosts")
+    // let hosts = require("./hosts")
+    let rawdata = fs.readFileSync('hosts.json');
+    let hosts = JSON.parse(rawdata);
     let _hosts = hosts.map((item, idx) => {
         return { "id": idx + 1, host: item[0],addr:item[1] }
     })
