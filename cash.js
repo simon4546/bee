@@ -26,6 +26,7 @@ function pad(str, max) {
 }
 
 async function getPeers(url) {
+    let response=null;
     try {
         response = await axios.get(`${url}/chequebook/cheque`)
         // console.log(response.data)
@@ -34,7 +35,8 @@ async function getPeers(url) {
         })
         return peers
     } catch (ex) {
-        console.error(ex)
+        return []
+        // console.error(ex)
     }
 }
 

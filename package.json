@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "node index.js",
+    "build": "pkg -t win package.json"
   },
   "bin": "index.js",
   "keywords": [],
