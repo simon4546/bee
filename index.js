@@ -1,5 +1,7 @@
 const express = require('express');
-let cashUtil = require("./cash")
+let cashUtil = require("./cash");
+const fs = require('fs');
+const path = require('path');
 var async = require("async");
 var compression = require('compression')
 
@@ -9,14 +11,18 @@ webapp.use(compression());
 webapp.use(express.json()) // for parsing application/json
 webapp.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-webapp.use(express.static('static'))
+webapp.use(express.static(path.join(__dirname, 'static')))
 webapp.get('/hosts', (req, res) => {
-    let hosts = require("./hosts")
+    // let hosts = require("./hosts")
+    console.log("拉取列表")
+    let rawdata = fs.readFileSync('hosts.json');
+    let hosts = JSON.parse(rawdata);
     let _hosts = hosts.map((item, idx) => {
         return { "id": idx + 1, host: item[0],addr:item[1] }
     })
     let result = { "code": 0, "msg": "", "count": hosts.length, "data": _hosts }
     res.json(result)
+    
 })
 webapp.get('/address', (req, res) => {
     let host = req.body.host;
@@ -36,6 +42,7 @@ webapp.post('/chequebook', (req, res) => {
 })
 webapp.post('/find', (req, res) => {
     let host = req.body.host;
+    console.log(`查询节点${host}`)
     cashUtil.getPeers(host).then((data) => {
         res.json(data.length)
     }).catch((ex) => {
@@ -44,6 +51,7 @@ webapp.post('/find', (req, res) => {
 })
 webapp.post('/check', (req, res) => {
     let host = req.body.host;
+    console.log(`兑换支票${host}`);
     cashUtil.cashoutOne(host).then((data) => {
         res.json(data)
     }).catch((ex) => {

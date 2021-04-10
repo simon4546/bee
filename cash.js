@@ -2,7 +2,10 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 var Promise = require("bluebird");
 axios.defaults.timeout = 5000;
-let urls = require("./hosts")
+const fs = require('fs');
+let rawdata = fs.readFileSync('hosts.json');
+let urls = JSON.parse(rawdata);
+// let urls = require("./hosts")
 
 axiosRetry(axios, {
     retries: 3, // number of retries
@@ -23,6 +26,7 @@ function pad(str, max) {
 }
 
 async function getPeers(url) {
+    let response=null;
     try {
         response = await axios.get(`${url}/chequebook/cheque`)
         // console.log(response.data)
@@ -31,7 +35,8 @@ async function getPeers(url) {
         })
         return peers
     } catch (ex) {
-        console.error(ex)
+        return []
+        // console.error(ex)
     }
 }
 
@@ -132,7 +137,7 @@ async function cashoutOne(url){
 async function cashoutall() {
     for (let index = 0; index < urls.length; index++) {
         await sleep(200);
-        const url = urls[index];
+        const url = urls[index][0];
         let peers = await getPeers(url)
         let total = await Promise.map(peers, async function (item, idx) {
             let value = await getCumulativePayout(url, item)
@@ -178,7 +183,7 @@ async function cashoutall() {
 
 async function address() {
     for (let index = 0; index < urls.length; index++) {
-        const url = urls[index];
+        const url = urls[index][0];
         let address = await getAddress(url);
         if (Object.prototype.toString.call(address) != '[object Error]') {
             console.log(url, address)
