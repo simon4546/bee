@@ -61,6 +61,7 @@ function cashoutAll() {
   for peer in $(getPeers)
   do
     local uncashedAmount=$(getUncashedAmount $peer)
+    echo "try cash cheque for $peer ($uncashedAmount uncashed)" >&2
     if (( "$uncashedAmount" > $minAmount ))
     then
       echo "uncashed cheque for $peer ($uncashedAmount uncashed)" >&2
