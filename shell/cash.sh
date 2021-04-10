@@ -1,14 +1,13 @@
 #!/bin/bash
+#./cash.sh password root
+# ./cash.sh cashout root
 function password() {
     cat ./hostlist.txt | while read i
     do
         USER=$1
         IP=`echo $i | awk '{print $1}'`
         echo "try $IP"
-        (ssh $USER@$IP "cat /data/bee/password;cat /var/lib/bee/password;" & )  1>> passwd.txt
-        if [ $? -ne 0 ];then
-            echo "$IP执行过程中出现异常"
-        fi
+        ssh $USER@$IP "cat /data/bee/password /var/lib/bee/password 2>/dev/null;" < /dev/null
     done
 }
 function cashOut() {
