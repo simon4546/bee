@@ -1,7 +1,9 @@
 #1/usr/bin/env sh
 DEBUG_API=http://localhost:1635
 MIN_AMOUNT=5000
-
+function myIP() {
+ curl -s http://whatismyip.akamai.com/
+}
 function getPeers() {
   curl -s "$DEBUG_API/chequebook/cheque" | jq -r '.lastcheques | .[].peer'
 }
@@ -46,7 +48,7 @@ function cashout() {
   local peer=$1
   txHash=$(curl -s -XPOST "$DEBUG_API/chequebook/cashout/$peer" | jq -r .transactionHash) 
 
-  echo cashing out cheque for $peer in transaction $txHash >&2
+  echo $MYIP cashing out cheque for $peer in transaction $txHash >&2
 
   result="$(curl -s $DEBUG_API/chequebook/cashout/$peer | jq .result)"
   while [ "$result" == "null" ]
@@ -80,7 +82,7 @@ function listAllUncashed() {
     fi
   done
 }
-
+MYIP=$(myIP)
 case $1 in
 cashout)
   cashout $2
