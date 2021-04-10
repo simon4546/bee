@@ -1,6 +1,6 @@
 #1/usr/bin/env sh
 DEBUG_API=http://localhost:1635
-MIN_AMOUNT=1000
+MIN_AMOUNT=5000
 
 function getPeers() {
   curl -s "$DEBUG_API/chequebook/cheque" | jq -r '.lastcheques | .[].peer'
