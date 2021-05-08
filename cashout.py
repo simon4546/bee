@@ -42,13 +42,18 @@ def getCumulativePayout(peer):
 
 
 def cashout(peer):
-    txHash=post(DEBUG_API+"/chequebook/cashout/"+peer) 
+    tryCount=0
+    txHash=post(DEBUG_API+"/chequebook/cashout/"+peer,{}) 
     txHash=txHash['transactionHash']
     print('cashing out cheque for '+peer+' in transaction '+txHash)
     result=get(DEBUG_API+"/chequebook/cashout/"+peer)
     result=result['result']
     while result ==None:
         time.sleep(5)
+        if tryCount> 20:
+            break
+        tryCount=tryCount+1
+        print("retry cashout "+tryCount)
         result=get(DEBUG_API+"/chequebook/cashout/"+peer)
         result=result['result']
     
@@ -65,5 +70,5 @@ def cashoutAll():
 
 
 cashoutAll()
-# cashout('2e375b65ddff2ae0823d76b073d0b6af8075a36ba35397115bf522bdfc90c618')
+#cashout('45d5f3d1129c32adca60e949c9c2e190e7dfa2b5d304db225dec6851e0253ac0')
 #   curl -s "$DEBUG_API/chequebook/cheque" | jq -r '.lastcheques | .[].peer'
