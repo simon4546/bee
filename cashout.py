@@ -54,11 +54,14 @@ def cashout(peer):
     
 def cashoutAll():
     peerlist=getPeers()
+    count=0
     for p in peerlist:
         uncashedAmount=getUncashedAmount(p)
         print(p,uncashedAmount)
         if uncashedAmount > 5000:
+            count=count+1
             cashout(p)
+    print("total count:"+count)
 
 
 cashoutAll()
