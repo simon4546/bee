@@ -53,9 +53,10 @@ def cashout(peer):
         if tryCount> 20:
             break
         tryCount=tryCount+1
-        print("retry cashout "+tryCount)
         result=get(DEBUG_API+"/chequebook/cashout/"+peer)
+        print(result)
         result=result['result']
+        print("retry cashout "+str(tryCount),result)
     
 def cashoutAll():
     peerlist=getPeers()
@@ -69,6 +70,6 @@ def cashoutAll():
     print("total count:"+count)
 
 
-cashoutAll()
-#cashout('45d5f3d1129c32adca60e949c9c2e190e7dfa2b5d304db225dec6851e0253ac0')
+# cashoutAll()
+cashout('45d5f3d1129c32adca60e949c9c2e190e7dfa2b5d304db225dec6851e0253ac0')
 #   curl -s "$DEBUG_API/chequebook/cheque" | jq -r '.lastcheques | .[].peer'
