@@ -6,8 +6,11 @@ import time
 DEBUG_API='http://localhost:1635'
 
 def get(url):
-    f = urllib.request.urlopen(url)
-    return json.loads(f.read().decode('utf-8'))
+    try:
+        f = urllib.request.urlopen(url)
+        return json.loads(f.read().decode('utf-8'))
+    except:
+        return {}
 
 def post(url,data):
     f = urllib.request.urlopen(url,data)
@@ -33,13 +36,15 @@ def getUncashedAmount(peer):
     return uncashedAmount
 
 def getLastCashedPayout(peer):
+    print(DEBUG_API+"/chequebook/cashout/"+peer)
     result=get(DEBUG_API+"/chequebook/cashout/"+peer)
-    return result['cumulativePayout']
+    if 'cumulativePayout' in result:
+        return result['cumulativePayout']
+    return 0
 
 def getCumulativePayout(peer):
     result=get(DEBUG_API+"/chequebook/cheque/"+peer)
     return result['lastreceived']['payout']
-
 
 def cashout(peer):
     tryCount=0
@@ -67,9 +72,9 @@ def cashoutAll():
         if uncashedAmount > 5000:
             count=count+1
             cashout(p)
-    print("total count:"+count)
+    print("total count:"+str(count))
 
 
-# cashoutAll()
-cashout('45d5f3d1129c32adca60e949c9c2e190e7dfa2b5d304db225dec6851e0253ac0')
+cashoutAll()
+# cashout('45d5f3d1129c32adca60e949c9c2e190e7dfa2b5d304db225dec6851e0253ac0')
 #   curl -s "$DEBUG_API/chequebook/cheque" | jq -r '.lastcheques | .[].peer'
